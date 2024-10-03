@@ -2,46 +2,53 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Tymon\JWTAuth\Contracts\JWTSubject; // Importar la interfaz JWTSubject
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail, JWTSubject // Implementar JWTSubject
 {
-    use HasFactory, Notifiable;
+    use Notifiable, HasApiTokens;
+    public function isAdmin()
+    {
+        return $this->role === 'admin'; // Ajusta esto si tu lógica es diferente
+    }
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
+        'role', // Si tienes un campo de rol
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
     /**
-     * Get the attributes that should be cast.
+     * Obtiene el identificador único para el usuario que se utiliza en el JWT.
      *
-     * @return array<string, string>
+     * @return mixed
      */
-    protected function casts(): array
+    public function getJWTIdentifier()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->getKey(); // Devuelve la clave primaria del usuario
+    }
+
+    /**
+     * Obtiene el conjunto de reclamaciones para el JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return []; // Puedes agregar reclamos personalizados si lo deseas
     }
 }
