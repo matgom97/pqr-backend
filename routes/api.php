@@ -26,5 +26,6 @@ Route::middleware('api')->group(function () {
         Route::get('/pqrs', [PqrController::class, 'index']); // Listar PQR (solo para admin)
         Route::get('/pqr/{id}', [PqrController::class, 'show']); // Ver PQR específica
         Route::delete('/pqr/{id}', [PqrController::class, 'destroy']); // Eliminar PQR
+        Route::put('/pqr/{id}', [PqrController::class, 'update']);
     });
 });

@@ -54,7 +54,7 @@ class PqrController extends Controller
              'pqr' => $pqr,
          ], 201);
      }
-     
+
     // Listar todas las PQR (solo las del usuario si no es admin)
     public function index(Request $request)
     {
@@ -103,26 +103,26 @@ class PqrController extends Controller
         $validated = $request->validate([
             'fecha_incidencia' => 'required|date',
             'identificacion' => 'required|string',
+            'primer_nombre' => 'required|string',
+            'primer_apellido' => 'required|string',
+            'correo' => 'required|email',
+            'medio_notificacion' => 'required|string',
             'tipo' => 'required|in:Petición,Queja,Reclamo',
+            'causas' => 'nullable|string', // Permitir campos opcionales
             'observacion' => 'required|string',
         ]);
-
+    
         // Obtener la PQR
         $pqr = Pqr::findOrFail($id);
-
+    
         // Verificar si el usuario es administrador o es el creador de la PQR
         if (!Auth::user()->isAdmin() && $pqr->user_id !== Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-
-        // Actualizar la PQR
-        $pqr->update([
-            'fecha_incidencia' => $validated['fecha_incidencia'],
-            'identificacion' => $validated['identificacion'],
-            'tipo' => $validated['tipo'],
-            'observacion' => $validated['observacion'],
-        ]);
-
+    
+        // Actualizar la PQR con todos los campos validados
+        $pqr->update($validated);
+    
         return response()->json($pqr);
     }
 
@@ -142,4 +142,6 @@ class PqrController extends Controller
 
         return response()->json(['message' => 'PQR eliminada con éxito.']);
     }
+
+    
 }
