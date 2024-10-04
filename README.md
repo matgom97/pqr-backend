@@ -1,66 +1,171 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Documentation API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# AuthController
 
-## About Laravel
+    1.	register: Registra un nuevo usuario, validando que el correo sea de Gmail o Hotmail y que la contraseña cumpla con ciertos criterios de seguridad.
+    2.	login: Autentica al usuario con su correo y contraseña, y genera un token JWT para las sesiones.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+# PqrController
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+    1.	store: Crea una nueva PQR, asociándola con el usuario autenticado.
+    2.	index: Lista todas las PQR con opción de filtrar por fecha o tipo, accesible solo por administradores.
+    3.	show: Muestra los detalles de una PQR específica, accesible solo para administradores o el creador.
+    4.	update: Actualiza una PQR existente, verificando si el usuario tiene permisos para modificarla.
+    5.	destroy: Elimina una PQR específica, verificando los permisos del usuario.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+# UserController
 
-## Learning Laravel
+    1.	index: Lista todos los usuarios, solo accesible para administradores.
+    2.	update: Actualiza los datos de un usuario existente.
+    3.	destroy: Elimina un usuario del sistema.
+    4.	changePassword: Permite a los usuarios cambiar su contraseña, verificando la contraseña actual antes de hacer el cambio.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# CREAR LA BASE DE DATOS
 
-## Laravel Sponsors
+En el archivo .env se encuentra el nombre de la base de datos
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Ejecutar el comando php artisan migrate para ejecutar las migraciones ya creadas a la base de datos, esto se hace para no crear una tabla en la base de datos manualmente 
 
-### Premium Partners
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+CREATE TABLE `pqr` (
+  `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT(20) UNSIGNED NOT NULL,
+  `fecha_incidencia` DATE NOT NULL,
+  `identificacion` VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `primer_nombre` VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `primer_apellido` VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `correo` VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `medio_notificacion` VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `tipo` ENUM('Petición', 'Queja', 'Reclamo') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `causas` TEXT COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `observacion` TEXT COLLATE utf8mb4_unicode_ci NOT NULL,
+  `evidencias` TEXT COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT NULL,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-## Code of Conduct
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Ejemplos de como se usa en postman
 
-## Security Vulnerabilities
+Se debe usar el token para poder acceder a las otras rutas de la Api, en postman se debe ir a Autentication y luego seleccionar Bearer token
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# http://127.0.0.1:8000/api/register
+Body
 
-## License
+{
+"name": "mateo",
+"email": "testing@gmail.com",
+"password": "Prueba1!",
+"password_confirmation": "Prueba1!",
+"role": "user" // Aquí asignamos el rol de administrador
+}
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Respuesta
+
+{
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL3JlZ2lzdGVyIiwiaWF0IjoxNzI4MDA3NDEyLCJleHAiOjE3MjgwMTEwMTIsIm5iZiI6MTcyODAwNzQxMiwianRpIjoiZzdsc3NDaVRRaWVBd0VVWiIsInN1YiI6IjE2IiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.0q_sjE0WZv3W6QUg-ZoE8Iml0k4DfG5Qfo82-ci3L4c"
+}
+
+
+# http://localhost:8000/api/login
+body 
+
+{
+    "email": "testing@gmail.com",
+    "password": "Prueba1!"
+}
+
+Respuesta
+
+{
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzI4MDA3NTQyLCJleHAiOjE3MjgwMTExNDIsIm5iZiI6MTcyODAwNzU0MiwianRpIjoiVDJJd1VwRldsYWdjakxLciIsInN1YiI6IjE2IiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.p-vMuaHW4rLBDN_qvGs4Dp2zzrziY2Ct8nMVV5HvH_E",
+    "user": {
+        "name": "mateo",
+        "email": "testing@gmail.com",
+        "role": "user"
+    }
+}
+
+# http://localhost:8000/api/pqr
+Body
+
+{
+    "fecha_incidencia": "2024-10-04",
+    "identificacion": "987654321",
+    "primer_nombre": "Ana",
+    "primer_apellido": "Gómez",
+    "correo": "ana.gomez@example.com",
+    "medio_notificacion": "Teléfono",
+    "tipo": "Queja",
+    "causas": "Producto defectuoso",
+    "observacion": "El producto llegó dañado y no funciona.",
+    "evidencias": "Imagen adjunta del producto"
+}
+
+Respuesta
+
+{
+    "message": "PQR registrada con éxito.",
+    "codigo": 5,
+    "pqr": {
+        "user_id": 12,
+        "fecha_incidencia": "2024-10-04",
+        "identificacion": "987654321",
+        "primer_nombre": "Ana",
+        "primer_apellido": "Gómez",
+        "correo": "ana.gomez@example.com",
+        "medio_notificacion": "Teléfono",
+        "tipo": "Queja",
+        "causas": "Producto defectuoso",
+        "observacion": "El producto llegó dañado y no funciona.",
+        "evidencias": "Imagen adjunta del producto",
+        "updated_at": "2024-10-03T06:26:11.000000Z",
+        "created_at": "2024-10-03T06:26:11.000000Z",
+        "id": 5
+    }
+}
+
+# http://127.0.0.1:8000/api/users
+
+Agregar el token ser un usuario admin para ver el listado
+
+
+# http://localhost:8000/api/pqrs
+
+Agregar token
+
+# http://127.0.0.1:8000/api/users/9
+
+Agregar token de usuario admin
+
+# http://localhost:8000/api/pqr/5
+
+Agregar token
+
+# http://localhost:8000/api/change-password
+
+Usar token de un usuario ya creado 
+
+Body
+
+{
+    "current_password": "mateo1234",
+    "new_password": "Mateo12345!",
+    "new_password_confirmation": "Mateo12345!" // Debe coincidir con 'new_password'
+}
+
+Respuesta
+
+{
+    "message": "Contraseña actualizada con éxito."
+}
+
+#  http://localhost:8000/api/pqrs?fecha_incidencia=2024-10-02
+
+Agregar token y modificar los filtros con las pqr ya creadas
